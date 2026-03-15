@@ -16,9 +16,7 @@ An enhanced conversation addon for World of Warcraft 3.3.5a with a focus on imme
 
 - Open configuration panel: `/IDUI`
 
-## Screenshots
 
-*(Add Your Screenshots Here!)*
 
 ## Installation
 

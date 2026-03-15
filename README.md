@@ -11,7 +11,6 @@ An enhanced conversation addon for World of Warcraft 3.3.5a with a focus on imme
 - **Customizable Controls**: Remappable hotkeys for continue/decline actions
 - **Flexible Positioning**: Fully adjustable UI placement and size via slider controls
 - **Controller Support**: Gamepad button icons (can be reverted to keyboard icons by replacing included TGA files)
-- **Ascension Support**: Dynamically handles Ascension's custom interaction types (e.g. Woodcutting, Riding, and Innkeepers) with themed icons and accommodates massively long dialog prompts without breaking layout.
 
 ## Commands
 

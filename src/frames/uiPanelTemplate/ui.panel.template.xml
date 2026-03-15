@@ -39,7 +39,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        local parent = this:GetParent();
+                        local parent = self:GetParent();
                         parent:SetValue(parent:GetValue() - (parent:GetHeight() / 2));
                         PlaySound("UChatScrollButton");
                     </OnClick>
@@ -51,7 +51,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        local parent = this:GetParent();
+                        local parent = self:GetParent();
                         parent:SetValue(parent:GetValue() + (parent:GetHeight() / 2));
                         PlaySound("UChatScrollButton");
                     </OnClick>
@@ -60,7 +60,7 @@
         </Frames>
         <Scripts>
             <OnValueChanged>
-                this:GetParent():SetVerticalScroll(arg1);
+                self:GetParent():SetVerticalScroll(value);
             </OnValueChanged>
         </Scripts>
         <ThumbTexture name="$parentThumbTexture" inherits="DUIPanelScrollBarButton"
@@ -82,7 +82,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        local parent = this:GetParent();
+                        local parent = self:GetParent();
                         parent:SetValue(parent:GetValue() - (parent:GetHeight() / 2));
                         PlaySound("UChatScrollButton");
                     </OnClick>
@@ -94,7 +94,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-                        local parent = this:GetParent();
+                        local parent = self:GetParent();
                         parent:SetValue(parent:GetValue() + (parent:GetHeight() / 2));
                         PlaySound("UChatScrollButton");
                     </OnClick>
@@ -125,7 +125,7 @@
                 </Backdrop>
                 <Scripts>
                     <OnLoad>
-                        this:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r,
+                        self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r,
                         TOOLTIP_DEFAULT_COLOR.g,
                         TOOLTIP_DEFAULT_COLOR.b, 0.5);
                     </OnLoad>
@@ -134,7 +134,7 @@
         </Frames>
         <Scripts>
             <OnValueChanged>
-                this:GetParent():SetVerticalScroll(arg1);
+                self:GetParent():SetVerticalScroll(value);
             </OnValueChanged>
         </Scripts>
         <ThumbTexture name="$parentThumbTexture" inherits="DUIPanelScrollBarButton"
@@ -164,19 +164,19 @@
         </Frames>
         <Scripts>
             <OnLoad>
-                ScrollFrame_OnLoad();
+                ScrollFrame_OnLoad(self);
             </OnLoad>
             <OnScrollRangeChanged>
-                ScrollFrame_OnScrollRangeChanged(arg2);
+                ScrollFrame_OnScrollRangeChanged(self, xrange, yrange);
             </OnScrollRangeChanged>
             <!--  The code to disable the ScrollDownButton is pretty hacked, but it works -->
             <OnVerticalScroll>
-                local scrollbar = getglobal(this:GetName().."ScrollBar");
-                scrollbar:SetValue(arg1);
+                local scrollbar = getglobal(self:GetName().."ScrollBar");
+                scrollbar:SetValue(offset);
                 local min;
                 local max;
                 min, max = scrollbar:GetMinMaxValues();
-                if ( arg1 == 0 ) then
+                if ( offset == 0 ) then
                 getglobal(scrollbar:GetName().."ScrollUpButton"):Disable();
                 else
                 getglobal(scrollbar:GetName().."ScrollUpButton"):Enable();
@@ -188,7 +188,7 @@
                 end
             </OnVerticalScroll>
             <OnMouseWheel>
-                ScrollFrameTemplate_OnMouseWheel(arg1);
+                ScrollFrameTemplate_OnMouseWheel(self, delta);
             </OnMouseWheel>
         </Scripts>
     </ScrollFrame>

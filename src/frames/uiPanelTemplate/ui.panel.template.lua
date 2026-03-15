@@ -1,5 +1,5 @@
-function ScrollFrameTemplate_OnMouseWheel(value, scrollBar)
-    scrollBar = scrollBar or getglobal(this:GetName() .. "ScrollBar");
+function ScrollFrameTemplate_OnMouseWheel(self, value, scrollBar)
+    scrollBar = scrollBar or getglobal(self:GetName() .. "ScrollBar");
     if (value > 0) then
         scrollBar:SetValue(scrollBar:GetValue() - (scrollBar:GetHeight() / 2));
     else
@@ -8,22 +8,21 @@ function ScrollFrameTemplate_OnMouseWheel(value, scrollBar)
 end
 
 -- Scrollframe functions
-function ScrollFrame_OnLoad()
-    getglobal(this:GetName() .. "ScrollBarScrollDownButton"):Disable();
-    getglobal(this:GetName() .. "ScrollBarScrollUpButton"):Disable();
+function ScrollFrame_OnLoad(self)
+    getglobal(self:GetName() .. "ScrollBarScrollDownButton"):Disable();
+    getglobal(self:GetName() .. "ScrollBarScrollUpButton"):Disable();
 
-    local scrollbar = getglobal(this:GetName() .. "ScrollBar");
+    local scrollbar = getglobal(self:GetName() .. "ScrollBar");
     scrollbar:SetMinMaxValues(0, 0);
     scrollbar:SetValue(0);
-    this.offset = 0;
+    self.offset = 0;
 	
 end
 
-function ScrollFrame_OnScrollRangeChanged(scrollrange)
-    local scrollbar = getglobal(this:GetName() .. "ScrollBar");
-    if (not scrollrange) then
-        scrollrange = this:GetVerticalScrollRange();
-    end
+function ScrollFrame_OnScrollRangeChanged(self, xrange, yrange)
+    local scrollbar = getglobal(self:GetName() .. "ScrollBar");
+    local scrollrange = yrange or self:GetVerticalScrollRange();
+    
     local value = scrollbar:GetValue();
     if (value > scrollrange) then
         value = scrollrange;
@@ -31,8 +30,8 @@ function ScrollFrame_OnScrollRangeChanged(scrollrange)
     scrollbar:SetMinMaxValues(0, scrollrange);
     scrollbar:SetValue(value);
     if (floor(scrollrange) == 0) then
-        if (this.scrollBarHideable) then
-            getglobal(this:GetName() .. "ScrollBar"):Hide();
+        if (self.scrollBarHideable) then
+            getglobal(self:GetName() .. "ScrollBar"):Hide();
             getglobal(scrollbar:GetName() .. "ScrollDownButton"):Hide();
             getglobal(scrollbar:GetName() .. "ScrollUpButton"):Hide();
         else
@@ -45,17 +44,17 @@ function ScrollFrame_OnScrollRangeChanged(scrollrange)
     else
         getglobal(scrollbar:GetName() .. "ScrollDownButton"):Show();
         getglobal(scrollbar:GetName() .. "ScrollUpButton"):Show();
-        getglobal(this:GetName() .. "ScrollBar"):Show();
+        getglobal(self:GetName() .. "ScrollBar"):Show();
         getglobal(scrollbar:GetName() .. "ScrollDownButton"):Enable();
         getglobal(scrollbar:GetName() .. "ThumbTexture"):Show();
     end
 
     -- Hide/show scrollframe borders
-    local top = getglobal(this:GetName() .. "Top");
-    local bottom = getglobal(this:GetName() .. "Bottom");
-    local middle = getglobal(this:GetName() .. "Middle");
-    if (top and bottom and this.scrollBarHideable) then
-        if (this:GetVerticalScrollRange() == 0) then
+    local top = getglobal(self:GetName() .. "Top");
+    local bottom = getglobal(self:GetName() .. "Bottom");
+    local middle = getglobal(self:GetName() .. "Middle");
+    if (top and bottom and self.scrollBarHideable) then
+        if (self:GetVerticalScrollRange() == 0) then
             top:Hide();
             bottom:Hide();
         else
@@ -63,8 +62,8 @@ function ScrollFrame_OnScrollRangeChanged(scrollrange)
             bottom:Show();
         end
     end
-    if (middle and this.scrollBarHideable) then
-        if (this:GetVerticalScrollRange() == 0) then
+    if (middle and self.scrollBarHideable) then
+        if (self:GetVerticalScrollRange() == 0) then
             middle:Hide();
         else
             middle:Show();
@@ -72,13 +71,13 @@ function ScrollFrame_OnScrollRangeChanged(scrollrange)
     end
 end
 
-function ScrollingEdit_OnTextChanged(scrollFrame)
+function ScrollingEdit_OnTextChanged(self, scrollFrame)
     if (not scrollFrame) then
-        scrollFrame = this:GetParent();
+        scrollFrame = self:GetParent();
     end
 end
 
-function ScrollingEdit_OnCursorChanged(x, y, w, h)
-    this.cursorOffset = y;
-    this.cursorHeight = h;
+function ScrollingEdit_OnCursorChanged(self, x, y, w, h)
+    self.cursorOffset = y;
+    self.cursorHeight = h;
 end

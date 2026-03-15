@@ -30,15 +30,15 @@ MoneyTypeInfo["PLAYER"] = {
 	showSmallerCoins = "Backpack"
 };
 MoneyTypeInfo["STATIC"] = {
-	UpdateFunc = function()
-		return this.staticMoney;
+	UpdateFunc = function(self)
+		return self.staticMoney or 0;
 	end,
 
 	collapse = 1,
 };
 MoneyTypeInfo["AUCTION"] = {
-	UpdateFunc = function()
-		return this.staticMoney;
+	UpdateFunc = function(self)
+		return self.staticMoney;
 	end,
 	showSmallerCoins = "Backpack",
 	fixedWidth = 1,
@@ -102,52 +102,52 @@ MoneyTypeInfo["SEND_MAIL_COD"] = {
 	canPickup = 1,
 };
 
-function MoneyFrame_OnLoad()
-	this:RegisterEvent("PLAYER_MONEY");
-	this:RegisterEvent("PLAYER_TRADE_MONEY");
-	this:RegisterEvent("TRADE_MONEY_CHANGED");
-	this:RegisterEvent("SEND_MAIL_MONEY_CHANGED");
-	this:RegisterEvent("SEND_MAIL_COD_CHANGED");
-	MoneyFrame_SetType("PLAYER");
+function DMoneyFrame_OnLoad(self)
+	self:RegisterEvent("PLAYER_MONEY");
+	self:RegisterEvent("PLAYER_TRADE_MONEY");
+	self:RegisterEvent("TRADE_MONEY_CHANGED");
+	self:RegisterEvent("SEND_MAIL_MONEY_CHANGED");
+	self:RegisterEvent("SEND_MAIL_COD_CHANGED");
+	DMoneyFrame_SetType(self, "PLAYER");
 end
 
-function SmallMoneyFrame_OnLoad()
-	this:RegisterEvent("PLAYER_MONEY");
-	this:RegisterEvent("PLAYER_TRADE_MONEY");
-	this:RegisterEvent("TRADE_MONEY_CHANGED");
-	this:RegisterEvent("SEND_MAIL_MONEY_CHANGED");
-	this:RegisterEvent("SEND_MAIL_COD_CHANGED");
-	this.small = 1;
-	MoneyFrame_SetType("PLAYER");
+function DSmallMoneyFrame_OnLoad(self)
+	self:RegisterEvent("PLAYER_MONEY");
+	self:RegisterEvent("PLAYER_TRADE_MONEY");
+	self:RegisterEvent("TRADE_MONEY_CHANGED");
+	self:RegisterEvent("SEND_MAIL_MONEY_CHANGED");
+	self:RegisterEvent("SEND_MAIL_COD_CHANGED");
+	self.small = 1;
+	DMoneyFrame_SetType(self, "PLAYER");
 end
 
-function MoneyFrame_OnEvent()
-	if ( not this.info or not this:IsVisible() ) then
+function DMoneyFrame_OnEvent(self, event, ...)
+	if ( not self.info or not self:IsVisible() ) then
 		return;
 	end
 
-	if ( event == "PLAYER_MONEY" and this.moneyType == "PLAYER" ) then
-		DMoneyFrame_UpdateMoney();
-	elseif ( event == "PLAYER_TRADE_MONEY" and (this.moneyType == "PLAYER" or this.moneyType == "PLAYER_TRADE") ) then
-		DMoneyFrame_UpdateMoney();
-	elseif ( event == "TRADE_MONEY_CHANGED" and this.moneyType == "TARGET_TRADE" ) then
-		DMoneyFrame_UpdateMoney();
-	elseif ( event == "SEND_MAIL_MONEY_CHANGED" and (this.moneyType == "PLAYER" or this.moneyType == "SEND_MAIL") ) then
-		DMoneyFrame_UpdateMoney();
-	elseif ( event == "SEND_MAIL_COD_CHANGED" and (this.moneyType == "PLAYER" or this.moneyType == "SEND_MAIL_COD") ) then
-		DMoneyFrame_UpdateMoney();
+	if ( event == "PLAYER_MONEY" and self.moneyType == "PLAYER" ) then
+		DMoneyFrame_UpdateMoney(self);
+	elseif ( event == "PLAYER_TRADE_MONEY" and (self.moneyType == "PLAYER" or self.moneyType == "PLAYER_TRADE") ) then
+		DMoneyFrame_UpdateMoney(self);
+	elseif ( event == "TRADE_MONEY_CHANGED" and self.moneyType == "TARGET_TRADE" ) then
+		DMoneyFrame_UpdateMoney(self);
+	elseif ( event == "SEND_MAIL_MONEY_CHANGED" and (self.moneyType == "PLAYER" or self.moneyType == "SEND_MAIL") ) then
+		DMoneyFrame_UpdateMoney(self);
+	elseif ( event == "SEND_MAIL_COD_CHANGED" and (self.moneyType == "PLAYER" or self.moneyType == "SEND_MAIL_COD") ) then
+		DMoneyFrame_UpdateMoney(self);
 	end
 end
 
-function MoneyFrame_SetType(type)
+function DMoneyFrame_SetType(self, type)
 	local info = MoneyTypeInfo[type];
 	if ( not info ) then
 		message("Invalid money type: "..type);
 		return;
 	end
-	this.info = info;
-	this.moneyType = type;
-	local frameName = this:GetName();
+	self.info = info;
+	self.moneyType = type;
+	local frameName = self:GetName();
 	if ( info.canPickup ) then
 		getglobal(frameName.."GoldButton"):EnableMouse(true);
 		getglobal(frameName.."SilverButton"):EnableMouse(true);
@@ -158,15 +158,15 @@ function MoneyFrame_SetType(type)
 		getglobal(frameName.."CopperButton"):EnableMouse(false);
 	end
 
-	DMoneyFrame_UpdateMoney();
+	DMoneyFrame_UpdateMoney(self);
 end
 
 -- Update the money shown in a money frame
-function DMoneyFrame_UpdateMoney()
-	if ( this.info ) then
-		local money = this.info.UpdateFunc();
-		DMoneyFrame_Update(this:GetName(), money);
-		if ( this.hasPickup == 1 ) then
+function DMoneyFrame_UpdateMoney(self)
+	if ( self.info ) then
+		local money = self.info.UpdateFunc(self);
+		DMoneyFrame_Update(self:GetName(), money);
+		if ( self.hasPickup == 1 ) then
 			UpdateCoinPickupFrame(money);
 		end
 	else
@@ -184,7 +184,7 @@ function DMoneyFrame_Update(frameName, money)
 	-- Breakdown the money into denominations
 	local gold = floor(money / (COPPER_PER_SILVER * SILVER_PER_GOLD));
 	local silver = floor((money - (gold * COPPER_PER_SILVER * SILVER_PER_GOLD)) / COPPER_PER_SILVER);
-	local copper = mod(money, COPPER_PER_SILVER);
+	local copper = (money % COPPER_PER_SILVER);
 
 	local goldButton = getglobal(frameName.."GoldButton");
 	local silverButton = getglobal(frameName.."SilverButton");
@@ -199,13 +199,33 @@ function DMoneyFrame_Update(frameName, money)
 
 	-- Set values for each denomination
 	goldButton:SetText(gold);
-	goldButton:SetWidth(goldButton:GetTextWidth() + iconWidth);
+	goldButton:SetWidth(64);
+    local goldText = goldButton:GetFontString();
+    if goldText then 
+        goldText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+        goldText:SetTextColor(1, 0.82, 0) 
+        goldText:SetText(gold) -- Explicitly set text on fontstring
+    end
 	goldButton:Show();
+
 	silverButton:SetText(silver);
-	silverButton:SetWidth(silverButton:GetTextWidth() + iconWidth);
+	silverButton:SetWidth(64);
+    local silverText = silverButton:GetFontString();
+    if silverText then 
+        silverText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+        silverText:SetTextColor(1, 0.82, 0) 
+        silverText:SetText(silver) -- Explicitly set text on fontstring
+    end
 	silverButton:Show();
+
 	copperButton:SetText(copper);
-	copperButton:SetWidth(copperButton:GetTextWidth() + iconWidth);
+	copperButton:SetWidth(64);
+    local copperText = copperButton:GetFontString();
+    if copperText then 
+        copperText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+        copperText:SetTextColor(1, 0.82, 0) 
+        copperText:SetText(copper) -- Explicitly set text on fontstring
+    end
 	copperButton:Show();
 
 	-- Store how much money the frame is displaying
@@ -273,7 +293,7 @@ function RefreshMoneyFrame(frameName, money, small, collapse, showSmallerCoins)
 	--[[
 	local gold = floor(money / (COPPER_PER_SILVER * SILVER_PER_GOLD));
 	local silver = floor((money - (gold * COPPER_PER_SILVER * SILVER_PER_GOLD)) / COPPER_PER_SILVER);
-	local copper = mod(money, COPPER_PER_SILVER);
+	local copper = (money % COPPER_PER_SILVER);
 
 	local goldButton = getglobal(frameName.."GoldButton");
 	local silverButton = getglobal(frameName.."SilverButton");

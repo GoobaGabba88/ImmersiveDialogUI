@@ -18,7 +18,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(1, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -58,7 +58,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -98,7 +98,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -128,18 +128,18 @@
         </Frames>
         <Scripts>
             <OnLoad>
-				MoneyFrame_OnLoad();
+				DMoneyFrame_OnLoad(self);
 			</OnLoad>
             <OnEvent>
-				MoneyFrame_OnEvent();
+				DMoneyFrame_OnEvent(self, event, ...);
 			</OnEvent>
             <OnShow>
-				MoneyFrame_UpdateMoney();
+				DMoneyFrame_UpdateMoney(self);
 			</OnShow>
             <OnHide>
-				if ( this.hasPickup == 1 ) then
+				if ( self.hasPickup == 1 ) then
 					CoinPickupFrame:Hide();
-					this.hasPickup = 0;
+					self.hasPickup = 0;
 				end
 			</OnHide>
         </Scripts>
@@ -162,7 +162,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(1, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -203,7 +203,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -244,7 +244,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -275,18 +275,18 @@
         </Frames>
         <Scripts>
             <OnLoad>
-				SmallMoneyFrame_OnLoad();
+				DSmallMoneyFrame_OnLoad(self);
 			</OnLoad>
             <OnEvent>
-				MoneyFrame_OnEvent();
+				DMoneyFrame_OnEvent(self, event, ...);
 			</OnEvent>
             <OnShow>
-				DMoneyFrame_UpdateMoney();
+				DMoneyFrame_UpdateMoney(self);
 			</OnShow>
             <OnHide>
-				if ( this.hasPickup == 1 ) then
+				if ( self.hasPickup == 1 ) then
 					CoinPickupFrame:Hide();
-					this.hasPickup = 0;
+					self.hasPickup = 0;
 				end
 			</OnHide>
         </Scripts>

@@ -48,7 +48,7 @@
                 </Layers>
                 <Scripts>
                     <OnLoad>
-                        this:SetFrameLevel(this:GetFrameLevel() + 2);
+                        self:SetFrameLevel(self:GetFrameLevel() + 2);
                     </OnLoad>
                 </Scripts>
             </Frame>
@@ -343,7 +343,7 @@
                                         </Anchors>
                                         <Scripts>
                                             <OnLoad>
-                                                DQuestMoneyFrame_OnLoad();
+                                                DQuestMoneyFrame_OnLoad(self);
                                             </OnLoad>
                                         </Scripts>
                                     </Frame>
@@ -370,7 +370,7 @@
                                         </Layers>
                                         <Scripts>
                                             <OnLoad>
-                                                this:SetFrameLevel(this:GetFrameLevel() + 1);
+                                                self:SetFrameLevel(self:GetFrameLevel() + 1);
                                             </OnLoad>
                                         </Scripts>
                                     </Frame>
@@ -544,8 +544,8 @@
                                         </Anchors>
                                         <Scripts>
                                             <OnLoad>
-												SmallMoneyFrame_OnLoad();
-												MoneyFrame_SetType("STATIC");
+												DSmallMoneyFrame_OnLoad(self);
+												DMoneyFrame_SetType(self, "STATIC");
 											</OnLoad>
                                         </Scripts>
                                     </Frame>
@@ -892,7 +892,7 @@
                                                 </Anchors>
                                                 <Scripts>
                                                     <OnLoad>
-                                                        DQuestMoneyFrame_OnLoad();
+                                                        DQuestMoneyFrame_OnLoad(self);
                                                     </OnLoad>
                                                 </Scripts>
                                             </Frame>
@@ -978,8 +978,12 @@
                         </Anchors>
                         <Scripts>
                             <OnShow>
-                                this:UpdateScrollChildRect();
+                                self:UpdateScrollChildRect();
                             </OnShow>
+                            <OnScrollRangeChanged>
+                                ScrollFrame_OnScrollRangeChanged(self, xrange, yrange);
+                                self:UpdateScrollChildRect();
+                            </OnScrollRangeChanged>
                         </Scripts>
                         <ScrollChild>
                             <Frame name="DQuestGreetingScrollChildFrame">
@@ -1347,10 +1351,10 @@
         </Frames>
         <Scripts>
             <OnLoad>
-                DQuestFrame_OnLoad();
+                DQuestFrame_OnLoad(self);
             </OnLoad>
             <OnEvent>
-                DQuestFrame_OnEvent(event);
+                DQuestFrame_OnEvent(self, event, ...);
             </OnEvent>
             <OnShow>
                 DQuestFrame_OnShow();

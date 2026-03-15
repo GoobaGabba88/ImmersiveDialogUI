@@ -89,14 +89,14 @@
         </Layers>
         <Scripts>
             <OnLoad>
-                this.hasItem = 1;
+                self.hasItem = 1;
             </OnLoad>
             <OnEnter>
-                if ( this:GetAlpha() > 0 ) then
-                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-                if ( this.rewardType == "item" ) then
-                GameTooltip:SetQuestItem(this.type, this:GetID());
-                elseif ( this.rewardType == "spell" ) then
+                if ( self:GetAlpha() > 0 ) then
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+                if ( self.rewardType == "item" ) then
+                GameTooltip:SetQuestItem(self.type, self:GetID());
+                elseif ( self.rewardType == "spell" ) then
                 GameTooltip:SetQuestRewardSpell();
                 end
                 end
@@ -107,17 +107,17 @@
                 ResetCursor();
             </OnLeave>
             <OnUpdate>
-                CursorOnUpdate();
+                CursorOnUpdate(self);
             </OnUpdate>
             <OnClick>
-                QuestItem_OnClick();
+                DQuestItem_OnClick(self);
             </OnClick>
         </Scripts>
     </Button>
     <Button name="DQuestRewardItemTemplate" inherits="DQuestItemTemplate" virtual="true">
         <Scripts>
             <OnClick>
-                DQuestRewardItem_OnClick();
+                DQuestRewardItem_OnClick(self);
             </OnClick>
         </Scripts>
     </Button>
@@ -127,7 +127,7 @@
         </Size>
         <Scripts>
             <OnClick>
-            DQuestTitleButton_OnClick();
+            DQuestTitleButton_OnClick(self);
         </OnClick>
         </Scripts>
         <ButtonText>

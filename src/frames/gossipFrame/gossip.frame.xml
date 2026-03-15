@@ -17,7 +17,7 @@
         <Size x="190" y="20" />
         <Scripts>
             <OnClick>
-                DGossipTitleButton_OnClick();
+                DGossipTitleButton_OnClick(self);
             </OnClick>
         </Scripts>
         <HighlightTexture
@@ -103,7 +103,7 @@
                 </Layers>
                 <Scripts>
                     <OnLoad>
-                        this:SetFrameLevel(this:GetFrameLevel() + 2);
+                        self:SetFrameLevel(self:GetFrameLevel() + 2);
                     </OnLoad>
                 </Scripts>
             </Frame>
@@ -145,7 +145,7 @@
 							DGossipFrameGreetingGoodbyeButtonText:SetTextColor(1, 1, 1)
 						</OnLeave>
 						<OnClick>
-							DGossipFrame_CloseUI()
+							DGossipFrame_CloseUI(self);
 						</OnClick>
                         </Scripts>
                     </Button>
@@ -186,326 +186,38 @@
                                     </Layer>
                                 </Layers>
                                 <Frames>
-                                    <Button name="DGossipTitleButton1"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipFrameGreetingGoodbyeButton" relativePoint="TOPLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="-29" y="-45" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton2"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton1" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton3"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton2" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton4"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton3" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton5"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton4" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton6"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton5" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton7"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton6" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton8"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton7" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton9"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton8" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton10"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton9" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton11"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton10" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton12"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton11" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton13"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton12" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton14"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton13" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton15"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton14" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton16"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton15" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton17"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton16" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton18"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton17" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton19"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton18" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton20"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton19" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton21"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton20" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton22"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton21" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton23"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton22" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton24"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton23" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton25"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton24" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton26"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton25" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton27"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton26" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton28"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton27" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton29"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton28" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton30"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton1" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton31"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton1" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
-                                    <Button name="DGossipTitleButton32"
-                                        inherits="DGossipTitleButtonTemplate" parent="DGossipFrame">
-                                        <Anchors>
-										<Anchor point="TOPLEFT" relativeTo="DGossipTitleButton1" relativePoint="BOTTOMLEFT">
-                                                <Offset>
-                                                    <AbsDimension x="0" y="0" />
-                                                </Offset>
-                                            </Anchor>
-                                        </Anchors>
-                                    </Button>
+                                    <Button name="DGossipTitleButton1" inherits="DGossipTitleButtonTemplate" id="1" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton2" inherits="DGossipTitleButtonTemplate" id="2" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton3" inherits="DGossipTitleButtonTemplate" id="3" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton4" inherits="DGossipTitleButtonTemplate" id="4" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton5" inherits="DGossipTitleButtonTemplate" id="5" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton6" inherits="DGossipTitleButtonTemplate" id="6" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton7" inherits="DGossipTitleButtonTemplate" id="7" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton8" inherits="DGossipTitleButtonTemplate" id="8" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton9" inherits="DGossipTitleButtonTemplate" id="9" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton10" inherits="DGossipTitleButtonTemplate" id="10" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton11" inherits="DGossipTitleButtonTemplate" id="11" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton12" inherits="DGossipTitleButtonTemplate" id="12" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton13" inherits="DGossipTitleButtonTemplate" id="13" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton14" inherits="DGossipTitleButtonTemplate" id="14" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton15" inherits="DGossipTitleButtonTemplate" id="15" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton16" inherits="DGossipTitleButtonTemplate" id="16" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton17" inherits="DGossipTitleButtonTemplate" id="17" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton18" inherits="DGossipTitleButtonTemplate" id="18" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton19" inherits="DGossipTitleButtonTemplate" id="19" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton20" inherits="DGossipTitleButtonTemplate" id="20" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton21" inherits="DGossipTitleButtonTemplate" id="21" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton22" inherits="DGossipTitleButtonTemplate" id="22" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton23" inherits="DGossipTitleButtonTemplate" id="23" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton24" inherits="DGossipTitleButtonTemplate" id="24" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton25" inherits="DGossipTitleButtonTemplate" id="25" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton26" inherits="DGossipTitleButtonTemplate" id="26" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton27" inherits="DGossipTitleButtonTemplate" id="27" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton28" inherits="DGossipTitleButtonTemplate" id="28" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton29" inherits="DGossipTitleButtonTemplate" id="29" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton30" inherits="DGossipTitleButtonTemplate" id="30" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton31" inherits="DGossipTitleButtonTemplate" id="31" parent="DGossipFrame" />
+                                    <Button name="DGossipTitleButton32" inherits="DGossipTitleButtonTemplate" id="32" parent="DGossipFrame" />
                                     <Frame name="DGossipSpacerFrame">
                                         <Size>
                                             <AbsDimension x="5" y="35" />
@@ -527,7 +239,7 @@
         </Frames>
         <Scripts>
             <OnLoad>
-                DGossipFrame_OnLoad();
+                DGossipFrame_OnLoad(self);
             </OnLoad>
             <OnShow>
                 PlaySound("igQuestListOpen");
@@ -536,7 +248,7 @@
                 end
             </OnShow>
             <OnEvent>
-                DGossipFrame_OnEvent();
+                DGossipFrame_OnEvent(self, event, ...);
             </OnEvent>
             <OnHide>
                 PlaySound("igQuestListClose");

@@ -197,6 +197,8 @@ function DQuest_SetTextAndFadeIn(fontString, text)
         fontString:SetText(text or "");
     else
         fontString:SetAlpha(0);
+        fontString:SetFont("Fonts\\FRIZQT__.TTF", LayoutConfig.FontSize + 4, "OUTLINE");
+        fontString:SetTextColor(1, 1, 1); -- Bright white for contrast
         fontString:SetText(text or "");
         UIFrameFadeIn(fontString, QUEST_TEXT_FADE_DURATION, 0, 1);
     end
@@ -307,16 +309,16 @@ end
 -- ====== Main Functions (Modified for New Layout) ======
 -- ===================================================================
 
-function DQuestFrame_OnLoad()
-    this:RegisterEvent("QUEST_GREETING");
-    this:RegisterEvent("QUEST_DETAIL");
-    this:RegisterEvent("QUEST_PROGRESS");
-    this:RegisterEvent("QUEST_COMPLETE");
-    this:RegisterEvent("QUEST_FINISHED");
-    this:RegisterEvent("QUEST_ITEM_UPDATE");
+function DQuestFrame_OnLoad(self)
+    self:RegisterEvent("QUEST_GREETING");
+    self:RegisterEvent("QUEST_DETAIL");
+    self:RegisterEvent("QUEST_PROGRESS");
+    self:RegisterEvent("QUEST_COMPLETE");
+    self:RegisterEvent("QUEST_FINISHED");
+    self:RegisterEvent("QUEST_ITEM_UPDATE");
 	SetFontColor(DQuestFrameDeclineButtonText,"LightBrown");
 	SetFontColor(DQuestFrameGreetingGoodbyeButtonText,"LightBrown");
-	SetFontColor(DQuestFrameAcceptButton,"LightBrown");
+	SetFontColor(DQuestFrameAcceptButtonText,"LightBrown");
 	SetFontColor(DQuestFrameCancelButtonText,"LightBrown");
 	SetFontColor(DQuestFrameCompleteQuestButtonText,"LightBrown");
 	SetFontColor(DQuestFrameNpcNameText, "TitleBrown");
@@ -328,6 +330,19 @@ function DQuestFrame_OnLoad()
 end
 
 function HideDefaultFrames()
+    -- Commenting out chat hiding to allow user to run debug commands
+    -- HideFrame(ChatFrame1)
+    -- HideFrame(ChatFrame2) 
+    -- HideFrame(ChatFrame3)
+    -- HideFrame(ChatFrame4)
+    -- HideFrame(ChatFrame5)
+    -- HideFrame(ChatFrame6)
+    -- HideFrame(ChatFrame7)
+    -- HideFrame(ChatFrameMenuButton)
+    -- HideFrame(ChatFrameEditBox)
+    -- HideFrame(DQuestFrameAcceptButton)
+    -- DQuestFrameAcceptButton:Hide() 
+    -- DQuestFrameDeclineButton:Hide()
     QuestFrameGreetingPanel:Hide()
     QuestFrameDetailPanel:Hide()
     QuestFrameProgressPanel:Hide()
@@ -335,7 +350,7 @@ function HideDefaultFrames()
     QuestNpcNameFrame:Hide()
 end
 
-function DQuestFrame_OnEvent(event)
+function DQuestFrame_OnEvent(self, event, ...)
     if (event == "QUEST_FINISHED") then
         HideUIPanel(DQuestFrame);
         return;
@@ -389,8 +404,13 @@ function DQuestFrameRewardPanel_OnShow()
         DQuestRewardText:ClearAllPoints()
         DQuestRewardText:SetPoint("CENTER", UIParent, "BOTTOM", 0, LayoutConfig.TextBottomOffset+10)
 
+        DQuestFrameCancelButton:SetWidth(150)
+        DQuestFrameCancelButton:SetHeight(40)
         DQuestFrameCancelButton:ClearAllPoints()
         DQuestFrameCancelButton:SetPoint("CENTER", UIParent, "RIGHT", LayoutConfig.RightColumnXOffset, LayoutConfig.RightColumnYOffset)
+        
+        DQuestFrameCompleteQuestButton:SetWidth(150)
+        DQuestFrameCompleteQuestButton:SetHeight(40)
         DQuestFrameCompleteQuestButton:ClearAllPoints()
         DQuestFrameCompleteQuestButton:SetPoint("TOPLEFT", DQuestFrameCancelButton, "TOPLEFT", 0, LayoutConfig.AcceptButtonYOffset)
         
@@ -404,10 +424,10 @@ function DQuestFrameRewardPanel_OnShow()
     
     local fullRewardText = GetRewardText() or "";
     DRewardTextChunks = SplitQuestTextToChunks(fullRewardText);
-    if (table.getn(DRewardTextChunks) == 0) then DRewardTextChunks = { fullRewardText }; end
+    if (#DRewardTextChunks == 0) then DRewardTextChunks = { fullRewardText }; end
 
     DRewardCurrentChunkIndex = 1;
-    DRewardTextFullyDisplayed = table.getn(DRewardTextChunks) <= 1
+    DRewardTextFullyDisplayed = #DRewardTextChunks <= 1
     DQuest_SetTextAndFadeIn(DQuestRewardText, DRewardTextChunks[DRewardCurrentChunkIndex] or "");
 
     SetFontColor(DQuestFrameNpcNameText, "TitleBrown");
@@ -443,23 +463,23 @@ end
 function DQuestProgressCompleteButton_OnClick() CompleteQuest() end
 function DQuestGoodbyeButton_OnClick() DeclineQuest() end
 
-function DQuestItem_OnClick()
+function DQuestItem_OnClick(self)
     if (IsControlKeyDown()) then
-        if (this.rewardType ~= "spell") then DressUpItemLink(GetQuestItemLink(this.type, this:GetID())); end
+        if (self.rewardType ~= "spell") then DressUpItemLink(GetQuestItemLink(self.type, self:GetID())); end
     elseif (IsShiftKeyDown()) then
-        if (ChatFrameEditBox:IsVisible() and this.rewardType ~= "spell") then ChatFrameEditBox:Insert(GetQuestItemLink(this.type, this:GetID())); end
+        if (ChatFrameEditBox:IsVisible() and self.rewardType ~= "spell") then ChatFrameEditBox:Insert(GetQuestItemLink(self.type, self:GetID())); end
     end
 end
 
-function DQuestRewardItem_OnClick()
+function DQuestRewardItem_OnClick(self)
     if (IsControlKeyDown()) then
-        if (this.rewardType ~= "spell") then DressUpItemLink(GetQuestItemLink(this.type, this:GetID())); end
+        if (self.rewardType ~= "spell") then DressUpItemLink(GetQuestItemLink(self.type, self:GetID())); end
     elseif (IsShiftKeyDown()) then
-        if (ChatFrameEditBox:IsVisible()) then ChatFrameEditBox:Insert(GetQuestItemLink(this.type, this:GetID())); end
-    elseif (this.type == "choice") then
-        DQuestRewardItemHighlight:SetPoint("TOPLEFT", this, "TOPLEFT", -2, 5);
+        if (ChatFrameEditBox:IsVisible()) then ChatFrameEditBox:Insert(GetQuestItemLink(self.type, self:GetID())); end
+    elseif (self.type == "choice") then
+        DQuestRewardItemHighlight:SetPoint("TOPLEFT", self, "TOPLEFT", -2, 5);
         DQuestRewardItemHighlight:Show();
-        DQuestFrameRewardPanel.itemChoice = this:GetID();
+        DQuestFrameRewardPanel.itemChoice = self:GetID();
     end
 end
 
@@ -481,8 +501,13 @@ function DQuestFrameProgressPanel_OnShow()
         DQuestProgressText:ClearAllPoints()
         DQuestProgressText:SetPoint("CENTER", UIParent, "BOTTOM", 0, LayoutConfig.TextBottomOffset+10)
 
+        DQuestFrameGoodbyeButton:SetWidth(150)
+        DQuestFrameGoodbyeButton:SetHeight(40)
         DQuestFrameGoodbyeButton:ClearAllPoints()
         DQuestFrameGoodbyeButton:SetPoint("CENTER", UIParent, "RIGHT", LayoutConfig.RightColumnXOffset, LayoutConfig.RightColumnYOffset)
+        
+        DQuestFrameCompleteButton:SetWidth(150)
+        DQuestFrameCompleteButton:SetHeight(40)
         DQuestFrameCompleteButton:ClearAllPoints()
         DQuestFrameCompleteButton:SetPoint("TOPLEFT", DQuestFrameGoodbyeButton, "TOPLEFT", 0, LayoutConfig.AcceptButtonYOffset)
         
@@ -496,10 +521,10 @@ function DQuestFrameProgressPanel_OnShow()
 
     local fullProgressText = GetProgressText() or "";
     DProgressTextChunks = SplitQuestTextToChunks(fullProgressText);
-    if (table.getn(DProgressTextChunks) == 0) then DProgressTextChunks = { fullProgressText }; end
+    if (#DProgressTextChunks == 0) then DProgressTextChunks = { fullProgressText }; end
 
     DProgressCurrentChunkIndex = 1;
-    DProgressTextFullyDisplayed = table.getn(DProgressTextChunks) <= 1
+    DProgressTextFullyDisplayed = #DProgressTextChunks <= 1
     DQuest_SetTextAndFadeIn(DQuestProgressText, DProgressTextChunks[DProgressCurrentChunkIndex] or "");
 
     SetFontColor(DQuestFrameNpcNameText, "TitleBrown");
@@ -529,7 +554,7 @@ function DQuestFrameProgressItems_Update()
         lastAnchor = PositionBelow(DQuestProgressRequiredItemsText, lastAnchor, 0, LayoutConfig.AncillaryInitialYOffset)
         
         if (GetQuestMoneyToGet() > 0) then
-            MoneyFrame_Update("DQuestProgressRequiredMoneyFrame", GetQuestMoneyToGet());
+            DMoneyFrame_Update("DQuestProgressRequiredMoneyFrame", GetQuestMoneyToGet());
             if (GetQuestMoneyToGet() > GetMoney()) then
                 SetFontColor(DQuestProgressRequiredMoneyText, "DarkBrown");
                 SetMoneyFrameColor("DQuestProgressRequiredMoneyFrame", 1, 1, 1);
@@ -556,7 +581,7 @@ function DQuestFrameProgressItems_Update()
             SetItemButtonTexture(item, texture);
             
             item:ClearAllPoints()
-            if (mod(i, 2) == 1) then
+            if (((i) % 2) == 1) then
                 item:SetPoint("TOPLEFT", itemAnchor, "BOTTOMLEFT", 0, LayoutConfig.AncillarySpacing);
                 if i > 1 then itemAnchor = getglobal(questItemName .. (i-2)) end 
             else 
@@ -592,7 +617,8 @@ function DQuestFrameGreetingPanel_OnShow()
         DGreetingText:SetWidth(textWidth)
         DGreetingText:ClearAllPoints()
         DGreetingText:SetPoint("CENTER", UIParent, "BOTTOM", 0, LayoutConfig.TextBottomOffset+10)
-        
+        DQuestFrameGreetingGoodbyeButton:SetWidth(150)
+        DQuestFrameGreetingGoodbyeButton:SetHeight(40)
         DQuestFrameGreetingGoodbyeButton:ClearAllPoints()
         DQuestFrameGreetingGoodbyeButton:SetPoint("CENTER", UIParent, "RIGHT", LayoutConfig.RightColumnXOffset, LayoutConfig.RightColumnYOffset)
 
@@ -610,10 +636,10 @@ function DQuestFrameGreetingPanel_OnShow()
     
     local fullGreetingText = GetGreetingText() or "";
     DGreetingTextChunks = SplitQuestTextToChunks(fullGreetingText);
-    if (table.getn(DGreetingTextChunks) == 0) then DGreetingTextChunks = { fullGreetingText }; end
+    if (#DGreetingTextChunks == 0) then DGreetingTextChunks = { fullGreetingText }; end
 
     DGreetingCurrentChunkIndex = 1;
-    DGreetingTextFullyDisplayed = table.getn(DGreetingTextChunks) <= 1
+    DGreetingTextFullyDisplayed = #DGreetingTextChunks <= 1
     DQuest_SetTextAndFadeIn(DGreetingText, DGreetingTextChunks[DGreetingCurrentChunkIndex] or "");
 
     SetFontColor(DGreetingText, "DarkBrown");
@@ -647,7 +673,7 @@ function DQuestFrameGreetingPanel_OnShow()
 
             -- ==================== 修改DQuestTitleButton按钮====================
             -- 1. 获取按钮的 FontString 对象
-            local buttonText = getglobal(questTitleButton:GetName())
+            local buttonText = questTitleButton:GetFontString()
             if buttonText then
                 -- 2. 设置默认字体、大小和颜色
                 SetFontColor(buttonText, "LightBrown",LayoutConfig.FontSize-3)
@@ -684,7 +710,7 @@ function DQuestFrameGreetingPanel_OnShow()
 
             -- ==================== 新增代码 START ====================
             -- 1. 获取按钮的 FontString 对象
-            local buttonText = getglobal(questTitleButton:GetName())
+            local buttonText = questTitleButton:GetFontString()
             if buttonText then
                 -- 2. 设置默认字体、大小和颜色
                 SetFontColor(buttonText, "LightBrown",LayoutConfig.FontSize-3)
@@ -731,9 +757,12 @@ local function DQuest_HandleDetailKeyDown()
     DQuestCurrentChunkIndex = DQuestCurrentChunkIndex + 1;
     DQuest_SetTextAndFadeIn(DQuestDescription, DQuestTextChunks[DQuestCurrentChunkIndex] or "");
     
-    if (DQuestCurrentChunkIndex >= table.getn(DQuestTextChunks)) then
+    if (DQuestCurrentChunkIndex >= #DQuestTextChunks) then
         DQuestTextFullyDisplayed = true;
+        DQuestFrameAcceptButton:SetText("ACCEPT");
         DQuest_ShowDetailPanelRewards();
+    else
+        DQuestFrameAcceptButton:SetText("CONTINUE");
     end
 end
 
@@ -744,7 +773,7 @@ local function DQuest_HandleRewardKeyDown()
     end
     DRewardCurrentChunkIndex = DRewardCurrentChunkIndex + 1;
     DQuest_SetTextAndFadeIn(DQuestRewardText, DRewardTextChunks[DRewardCurrentChunkIndex] or "");
-    if (DRewardCurrentChunkIndex >= table.getn(DRewardTextChunks)) then
+    if (DRewardCurrentChunkIndex >= #DRewardTextChunks) then
         DRewardTextFullyDisplayed = true;
     end
 end
@@ -758,7 +787,7 @@ local function DQuest_HandleProgressKeyDown()
     end
     DProgressCurrentChunkIndex = DProgressCurrentChunkIndex + 1;
     DQuest_SetTextAndFadeIn(DQuestProgressText, DProgressTextChunks[DProgressCurrentChunkIndex] or "");
-    if (DProgressCurrentChunkIndex >= table.getn(DProgressTextChunks)) then
+    if (DProgressCurrentChunkIndex >= #DProgressTextChunks) then
         DProgressTextFullyDisplayed = true;
     end
 end
@@ -773,13 +802,12 @@ local function DQuest_HandleGreetingKeyDown()
     end
     DGreetingCurrentChunkIndex = DGreetingCurrentChunkIndex + 1;
     DQuest_SetTextAndFadeIn(DGreetingText, DGreetingTextChunks[DGreetingCurrentChunkIndex] or "");
-    if (DGreetingCurrentChunkIndex >= table.getn(DGreetingTextChunks)) then
+    if (DGreetingCurrentChunkIndex >= #DGreetingTextChunks) then
         DGreetingTextFullyDisplayed = true;
     end
 end
 
-function DQuestFrame_OnKeyDown()
-    local key = arg1;
+function DQuestFrame_OnKeyDown(self, key)
     
     -- 修改: 使用 KEY_NO 变量替代 "B"，并保留 ESCAPE
 	if (key == KEY_NO or key == "ESCAPE") then
@@ -866,15 +894,15 @@ function DQuestFrame_OnHide()
     HideBlackBars();
 end
 
-function DQuestTitleButton_OnClick()
-    if (this.isActive == 1) then SelectActiveQuest(this:GetID());
-    else SelectAvailableQuest(this:GetID()); end
+function DQuestTitleButton_OnClick(self)
+    if (self.isActive == 1) then SelectActiveQuest(self:GetID());
+    else SelectAvailableQuest(self:GetID()); end
     PlaySound("igQuestListSelect");
 end
 
-function DQuestMoneyFrame_OnLoad()
-    MoneyFrame_OnLoad();
-    MoneyFrame_SetType("STATIC");
+function DQuestMoneyFrame_OnLoad(self)
+    DMoneyFrame_OnLoad(self);
+    DMoneyFrame_SetType(self, "STATIC");
 end
 
 function DQuestFrameItems_Update(questState, initialAnchor)
@@ -924,7 +952,7 @@ function DQuestFrameItems_Update(questState, initialAnchor)
             if (isUsable) then SetItemButtonTextureVertexColor(item, 1.0, 1.0, 1.0); else SetItemButtonTextureVertexColor(item, 0.9, 0, 0); end
 
             item:ClearAllPoints()
-		if (mod(i, 2) == 1) then
+		if (((i) % 2) == 1) then
 			-- i=1,3,5... 先更新 itemAnchor，再锚点
 			if i > 1 then
 				itemAnchor = getglobal(questItemName .. (rewardsCount + i - 2))
@@ -936,7 +964,7 @@ function DQuestFrameItems_Update(questState, initialAnchor)
 		end
             item:Show();
         end
-        lastAnchor = getglobal(questItemName .. (rewardsCount + numQuestChoices - mod(numQuestChoices-1, 2))) 
+        lastAnchor = getglobal(questItemName .. (rewardsCount + numQuestChoices - ((numQuestChoices-1) % 2))) 
         rewardsCount = rewardsCount + numQuestChoices;
     else
         getglobal(questState .. "ItemChooseText"):Hide();
@@ -957,7 +985,7 @@ function DQuestFrameItems_Update(questState, initialAnchor)
 			SetItemButtonTexture(item, texture);
 		   
 			item:ClearAllPoints()
-			if (mod(i, 2) == 1) then
+			if (((i) % 2) == 1) then
 				-- 奇数号 → 新的一行（先更新锚点，再放置）
 				if i > 1 then
 					itemAnchor = getglobal(questItemName .. (rewardsCount + i - 2));
@@ -971,7 +999,7 @@ function DQuestFrameItems_Update(questState, initialAnchor)
 		end
 
 		-- 修正最后的 lastAnchor
-		lastAnchor = getglobal(questItemName .. (rewardsCount + numQuestRewards - mod(numQuestRewards-1, 2)))
+		lastAnchor = getglobal(questItemName .. (rewardsCount + numQuestRewards - ((numQuestRewards-1) % 2)))
 		rewardsCount = rewardsCount + numQuestRewards
 	else
 		getglobal(questState .. "ItemReceiveText"):Hide();
@@ -983,7 +1011,7 @@ function DQuestFrameItems_Update(questState, initialAnchor)
     if (money > 0) then
         local moneyFrame = getglobal(questState .. "MoneyFrame")
         lastAnchor = PositionBelow(moneyFrame, lastAnchor, 10, LayoutConfig.AncillarySpacing)
-        MoneyFrame_Update(questState .. "MoneyFrame", money);
+        DMoneyFrame_Update(questState .. "MoneyFrame", money);
         moneyFrame:Show()
     else
         getglobal(questState .. "MoneyFrame"):Hide();
@@ -1195,8 +1223,13 @@ function DQuestFrameDetailPanel_OnShow()
         DQuestDescription:ClearAllPoints()
         DQuestDescription:SetPoint("CENTER", UIParent, "BOTTOM", 0, LayoutConfig.TextBottomOffset+10)
 
+        DQuestFrameDeclineButton:SetWidth(150)
+        DQuestFrameDeclineButton:SetHeight(40)
         DQuestFrameDeclineButton:ClearAllPoints()
         DQuestFrameDeclineButton:SetPoint("CENTER", UIParent, "RIGHT", LayoutConfig.RightColumnXOffset, LayoutConfig.RightColumnYOffset)
+        
+        DQuestFrameAcceptButton:SetWidth(150)
+        DQuestFrameAcceptButton:SetHeight(40)
         DQuestFrameAcceptButton:ClearAllPoints()
         DQuestFrameAcceptButton:SetPoint("TOPLEFT", DQuestFrameDeclineButton, "TOPLEFT", 0, LayoutConfig.AcceptButtonYOffset)
         
@@ -1210,11 +1243,11 @@ function DQuestFrameDetailPanel_OnShow()
     
     local fullText = GetQuestText() or "";
     DQuestTextChunks = SplitQuestTextToChunks(fullText);
-    if (table.getn(DQuestTextChunks) == 0) then DQuestTextChunks = { fullText }; end
+    if (#DQuestTextChunks == 0) then DQuestTextChunks = { fullText }; end
 
     -- Removed typewriter effect variables, using same logic as other panels
     DQuestCurrentChunkIndex = 1;
-    DQuestTextFullyDisplayed = table.getn(DQuestTextChunks) <= 1;
+    DQuestTextFullyDisplayed = #DQuestTextChunks <= 1;
     
     DQuest_SetTextAndFadeIn(DQuestDescription, DQuestTextChunks[DQuestCurrentChunkIndex] or "");
 
@@ -1236,14 +1269,18 @@ function DQuestFrameDetailPanel_OnShow()
 	SetFontColor(DQuestDetailRewardTitleText, "TitleBrown");
     SetFontColor(DQuestFrameNpcNameText, "TitleBrown");
     SetFontColor(DQuestDescription, "DarkBrown");
-	DQuestDescription:SetFont("Fonts\\FRIZQT__.TTF", LayoutConfig.FontSize, "OUTLINE")
+	DQuestDescription:SetFont("Fonts\\FRIZQT__.TTF", LayoutConfig.FontSize + 4, "OUTLINE")
+    DQuestDescription:SetTextColor(1, 1, 1)
 
     DTextAlphaDependentFrame:SetAlpha(0);
     DQuestFrameAcceptButton:Disable();
     
     -- If text is already fully displayed (only one chunk), show rewards immediately
     if DQuestTextFullyDisplayed then
+        DQuestFrameAcceptButton:SetText("ACCEPT");
         DQuest_ShowDetailPanelRewards();
+    else
+        DQuestFrameAcceptButton:SetText("CONTINUE");
     end
 end
 

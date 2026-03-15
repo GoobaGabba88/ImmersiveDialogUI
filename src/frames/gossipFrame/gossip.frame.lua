@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global
+local IDUI_DEBUG = 0
 NUMGOSSIPBUTTONS = 32;
 local Text_Language = false
 --local Text_Language_Test = "en"
@@ -45,7 +45,9 @@ local LayoutConfig = {
 		IfCameraMode = 1,
 		IfButtonShow = 1,
 		IfXBOXButton = 0,
+        IfXBOXButton = 0,
  }
+local FontConfig = {}
 
 function ApplyDynamicLayout()
     -- ImmersiveUIDB 是由 ImmersiveDialogUI.lua 创建的全局设置表
@@ -83,7 +85,7 @@ function ApplyDynamicLayout()
 	--DEFAULT_CHAT_FRAME:AddMessage("LayoutConfig.WordMinLimit is " .. LayoutConfig.WordMinLimit) 
 	--DEFAULT_CHAT_FRAME:AddMessage("Text_Language is " .. Text_Language_Test) 
     -- 字体配置也需要在这里动态生成，因为它依赖于FontSize
-    local FontConfig = {
+    FontConfig = {
         ButtonFont = "Fonts\\FRIZQT__.TTF",
         ButtonFontSize = LayoutConfig.FontSize - 3,
         ButtonFontFlags = "OUTLINE",
@@ -138,6 +140,10 @@ function ApplyDynamicLayout()
 
     local lastAnchor = DGossipFrameGreetingGoodbyeButton;
 
+    local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight();
+    local spacing = LayoutConfig.AncillarySpacing
+    if NUMGOSSIPBUTTONS > 10 then spacing = spacing + 5 end -- Make it more compact if there are many buttons
+
     for i = 1, NUMGOSSIPBUTTONS do
         local button = getglobal("DGossipTitleButton" .. i);
         if button then
@@ -153,9 +159,9 @@ function ApplyDynamicLayout()
 			elseif i==8 then
 				button:SetPoint("BOTTOMLEFT", DGossipFrameGreetingGoodbyeButton, "TOPLEFT", -35, -LayoutConfig.AncillaryInitialYOffset);
             elseif i<8 then
-                button:SetPoint("TOPLEFT", lastAnchor, "BOTTOMLEFT", 0, LayoutConfig.AncillarySpacing);
+                button:SetPoint("TOPLEFT", lastAnchor, "BOTTOMLEFT", 0, spacing);
             elseif i>8 then
-                button:SetPoint("BOTTOMLEFT", lastAnchor, "TOPLEFT", 0, -LayoutConfig.AncillarySpacing);
+                button:SetPoint("BOTTOMLEFT", lastAnchor, "TOPLEFT", 0, -spacing);
             end
             
             lastAnchor = button;
@@ -186,7 +192,7 @@ end
 -- 优化后的文本分段函数（新增：若结束符后紧接省略符（… 或 多个 .），则不分句）
 function SplitGossipTextToChunks(text, word_limit_en, char_limit_zh)
     local mode = Text_Language and "zh" or "en"
-	DEFAULT_CHAT_FRAME:AddMessage("mode is " .. mode) 
+	--DEFAULT_CHAT_FRAME:AddMessage("mode is " .. mode) 
     local chunks = {}
     if type(text) ~= "string" or text == "" then return chunks end
     word_limit_en = word_limit_en or 45	--最大空格数
@@ -382,7 +388,7 @@ end
 function PlayNextGossipSentence()
     local sentence = DGossipTextChunks[DGossipCurrentChunkIndex] or "";
     DGossip_SetTextAndFadeIn(DGossipGreetingText, sentence);
-    if DGossipCurrentChunkIndex >= table.getn(DGossipTextChunks) then
+    if DGossipCurrentChunkIndex >= #DGossipTextChunks then
         DGossipTextFullyDisplayed = true;
     end
 end
@@ -390,7 +396,7 @@ end
 function StartGossipPagination(fullText)
     ResetGossipPaginationState();
     DGossipTextChunks = SplitGossipTextToChunks(fullText or "");
-    if table.getn(DGossipTextChunks) == 0 then
+    if #DGossipTextChunks == 0 then
         if fullText and fullText ~= "" then
             DGossipTextChunks = { fullText };
         else
@@ -403,7 +409,7 @@ function StartGossipPagination(fullText)
 end
 
 function AdvanceGossip()
-    if DGossipCurrentChunkIndex < table.getn(DGossipTextChunks) then
+    if DGossipCurrentChunkIndex < #DGossipTextChunks then
         DGossipCurrentChunkIndex = DGossipCurrentChunkIndex + 1;
         PlayNextGossipSentence();
     else
@@ -508,10 +514,10 @@ function HideDefaultFrames()
     if GossipFramePortrait then GossipFramePortrait:SetTexture() end
 end
 
-function DGossipFrame_OnLoad()
+function DGossipFrame_OnLoad(self)
     HideDefaultFrames()
-    this:RegisterEvent("GOSSIP_SHOW");
-    this:RegisterEvent("GOSSIP_CLOSED");
+    self:RegisterEvent("GOSSIP_SHOW");
+    self:RegisterEvent("GOSSIP_CLOSED");
 	KillPortrait();
     
     if not DGossipKeyFrame then
@@ -524,7 +530,7 @@ function DGossipFrame_OnLoad()
     end
 end
 
-function DGossipFrame_OnEvent()
+function DGossipFrame_OnEvent(self, event, ...)
     if (event == "GOSSIP_SHOW") then
 		-- 【修改】每次显示时都应用最新的布局和设置
 		ApplyDynamicLayout();
@@ -550,12 +556,11 @@ function DGossipFrame_OnEvent()
     end
 end
 
-function DGossipFrame_OnKeyDown()
+function DGossipFrame_OnKeyDown(self, key)
     -- 【新增】直接从 ImmersiveUIDB 读取最新的按键设置，并提供默认值
     local KEY_YES = (ImmersiveUIDB and ImmersiveUIDB.KEY_YES) or "E"
     local KEY_NO = (ImmersiveUIDB and ImmersiveUIDB.KEY_NO) or "R"
 
-    local key = arg1;
     -- 【修改】使用 KEY_NO 变量替代 "B"，并保留 ESCAPE
 	if (key == KEY_NO or key == "ESCAPE") then
         DGossipFrame_CloseUI()
@@ -603,8 +608,8 @@ function DGossipSelectOption(buttonIndex)
     end
 end
 
-function DGossipTitleButton_OnClick()
-    local b = this
+function DGossipTitleButton_OnClick(self)
+    local b = self
     if not b then return end
     DGossipTitleButton_OnClick_Direct(b)
 end
@@ -681,12 +686,14 @@ function DGossipFrameUpdate()
 end
 
 function DGossipFrameAvailableQuestsUpdate(...)
+    local numArgs = select("#", ...)
     local titleButton
     local titleIndex = 1
-    for i = 1, arg.n, 2 do
-        if (DGossipFrame.buttonIndex > NUMGOSSIPBUTTONS) then break end
+    for i = 1, numArgs, 5 do
+        if (DGossipFrame.buttonIndex > 32) then break end
         titleButton = getglobal("DGossipTitleButton" .. DGossipFrame.buttonIndex)
-        local numberedText = DGossipFrame.buttonIndex .. ". " .. arg[i]
+        local title = select(i, ...)
+        local numberedText = DGossipFrame.buttonIndex .. ". " .. title
         titleButton:SetText(numberedText)
         totalGossipButtons = totalGossipButtons + 1
         titleButton:SetID(titleIndex)
@@ -695,15 +702,48 @@ function DGossipFrameAvailableQuestsUpdate(...)
         if gossipIcon then gossipIcon:Hide() end
         if not gossipIcon then
             gossipIcon = titleButton:CreateTexture(titleButton:GetName() .. "GossipIcon", "OVERLAY")
-            gossipIcon:SetPoint("TOPLEFT", titleButton, "TOPLEFT", 3, -5)
         end
-        gossipIcon:SetTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\availableQuestIcon")
-        gossipIcon:Show()
-        titleButton:SetNormalTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\parchment\\OptionBackground-common")
-        SetFontColor(titleButton, "Ivory")
-        titleButton:SetHeight(titleButton:GetTextHeight() + 20)
+        gossipIcon:ClearAllPoints()
+        gossipIcon:SetPoint("LEFT", titleButton, "LEFT", 2, 0)
         gossipIcon:SetWidth(20)
         gossipIcon:SetHeight(20)
+        gossipIcon:SetTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\availableQuestIcon.tga")
+        gossipIcon:Show()
+        titleButton:SetNormalTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\parchment\\OptionBackground-common")
+        local titleButtonText = titleButton:GetFontString()
+        if titleButtonText then 
+            titleButtonText:ClearAllPoints()
+            titleButtonText:SetPoint("LEFT", titleButton, "LEFT", 28, 0)
+            titleButtonText:SetJustifyH("LEFT")
+            SetFontColor(titleButtonText, "Ivory") 
+        end
+        local ITEMS_PER_COLUMN = 10
+        local colIndex = math.floor((DGossipFrame.buttonIndex - 1) / ITEMS_PER_COLUMN)
+        local itemInCol = (DGossipFrame.buttonIndex - 1) % ITEMS_PER_COLUMN
+
+        local spacing = LayoutConfig.AncillarySpacing or -10
+        local fontSize = LayoutConfig.FontSize - 2
+        titleButton:SetWidth(400)
+        titleButton:SetHeight(fontSize + 15)
+        local fs = titleButton:GetFontString()
+        if fs then fs:SetFont(FontConfig.ButtonFont, fontSize, FontConfig.ButtonFontFlags) end
+
+        titleButton:ClearAllPoints()
+        if itemInCol == 0 then
+            if colIndex == 0 then
+                titleButton:SetPoint("TOPLEFT", DGossipFrameGreetingGoodbyeButton, "BOTTOMLEFT", -50, LayoutConfig.AncillaryInitialYOffset or -10)
+            else
+                local topOfPrevCol = getglobal("DGossipTitleButton" .. (DGossipFrame.buttonIndex - ITEMS_PER_COLUMN))
+                if topOfPrevCol then
+                    titleButton:SetPoint("TOPLEFT", topOfPrevCol, "TOPLEFT", 230, 0)
+                end
+            end
+        else
+            local prevButton = getglobal("DGossipTitleButton" .. (DGossipFrame.buttonIndex - 1))
+            if prevButton then
+                titleButton:SetPoint("TOPLEFT", prevButton, "TOPLEFT", 0, -(fontSize + 15) + spacing)
+            end
+        end
         DGossipFrame.buttonIndex = DGossipFrame.buttonIndex + 1
         titleIndex = titleIndex + 1
         titleButton:Show()
@@ -711,12 +751,14 @@ function DGossipFrameAvailableQuestsUpdate(...)
 end
 
 function DGossipFrameActiveQuestsUpdate(...)
+    local numArgs = select("#", ...)
     local titleButton;
     local titleIndex = 1;
-    for i = 1, arg.n, 2 do
-        if (DGossipFrame.buttonIndex > NUMGOSSIPBUTTONS) then break end
+    for i = 1, numArgs, 5 do
+        if (DGossipFrame.buttonIndex > 32) then break end
         titleButton = getglobal("DGossipTitleButton" .. DGossipFrame.buttonIndex);
-        local numberedText = DGossipFrame.buttonIndex .. ". " .. arg[i]
+        local title = select(i, ...)
+        local numberedText = DGossipFrame.buttonIndex .. ". " .. title
         titleButton:SetText(numberedText);
         totalGossipButtons = totalGossipButtons + 1
         titleButton:SetID(titleIndex);
@@ -726,28 +768,64 @@ function DGossipFrameActiveQuestsUpdate(...)
         if gossipIcon then gossipIcon:Hide() end
         if not gossipIcon then
             gossipIcon = titleButton:CreateTexture(gossipIconName, "OVERLAY")
-            gossipIcon:SetPoint("TOPLEFT", titleButton, "TOPLEFT", 3, -5)
         end
-        gossipIcon:SetTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\activeQuestIcon");
+        gossipIcon:ClearAllPoints()
+        gossipIcon:SetPoint("LEFT", titleButton, "LEFT", 2, 0)
+        gossipIcon:SetWidth(20)
+        gossipIcon:SetHeight(20)
+        gossipIcon:SetTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\activeQuestIcon.tga");
         gossipIcon:Show()
+        local ITEMS_PER_COLUMN = 10
+        local colIndex = math.floor((DGossipFrame.buttonIndex - 1) / ITEMS_PER_COLUMN)
+        local itemInCol = (DGossipFrame.buttonIndex - 1) % ITEMS_PER_COLUMN
+
+        local spacing = LayoutConfig.AncillarySpacing or -10
+        local fontSize = LayoutConfig.FontSize - 2
+        titleButton:SetWidth(400)
+        titleButton:SetHeight(fontSize + 15)
+        local fs = titleButton:GetFontString()
+        if fs then fs:SetFont(FontConfig.ButtonFont, fontSize, FontConfig.ButtonFontFlags) end
+
+        titleButton:ClearAllPoints()
+        if itemInCol == 0 then
+            if colIndex == 0 then
+                titleButton:SetPoint("TOPLEFT", DGossipFrameGreetingGoodbyeButton, "BOTTOMLEFT", -50, LayoutConfig.AncillaryInitialYOffset or -10)
+            else
+                local topOfPrevCol = getglobal("DGossipTitleButton" .. (DGossipFrame.buttonIndex - ITEMS_PER_COLUMN))
+                if topOfPrevCol then
+                    titleButton:SetPoint("TOPLEFT", topOfPrevCol, "TOPLEFT", 230, 0)
+                end
+            end
+        else
+            local prevButton = getglobal("DGossipTitleButton" .. (DGossipFrame.buttonIndex - 1))
+            if prevButton then
+                titleButton:SetPoint("TOPLEFT", prevButton, "TOPLEFT", 0, -(fontSize + 15) + spacing)
+            end
+        end
         DGossipFrame.buttonIndex = DGossipFrame.buttonIndex + 1;
         titleIndex = titleIndex + 1;
         titleButton:Show();
         titleButton:SetNormalTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\parchment\\OptionBackground-common")
         titleButton:SetHeight(titleButton:GetTextHeight() + 20)
-        gossipIcon:SetHeight(20)
-        gossipIcon:SetWidth(20)
-        SetFontColor(titleButton, "Ivory")
+        local titleButtonText = titleButton:GetFontString()
+        if titleButtonText then 
+            titleButtonText:ClearAllPoints()
+            titleButtonText:SetPoint("LEFT", titleButton, "LEFT", 28, 0)
+            titleButtonText:SetJustifyH("LEFT")
+            SetFontColor(titleButtonText, "Ivory") 
+        end
     end
 end
 
 function DGossipFrameOptionsUpdate(...)
+    local numArgs = select("#", ...)
     local titleButton;
     local titleIndex = 1;
-    for i = 1, arg.n, 2 do
-        if (DGossipFrame.buttonIndex > NUMGOSSIPBUTTONS) then break end
+    for i = 1, numArgs, 2 do
+        if (DGossipFrame.buttonIndex > 32) then break end
         titleButton = getglobal("DGossipTitleButton" .. DGossipFrame.buttonIndex);
-        local numberedText = DGossipFrame.buttonIndex .. ". " .. arg[i]
+        local title = select(i, ...)
+        local numberedText = DGossipFrame.buttonIndex .. ". " .. title
         titleButton:SetText(numberedText);
         totalGossipButtons = totalGossipButtons + 1
         titleButton:SetID(titleIndex);
@@ -757,14 +835,58 @@ function DGossipFrameOptionsUpdate(...)
         if gossipIcon then gossipIcon:Hide() end
         if not gossipIcon then
             gossipIcon = titleButton:CreateTexture(gossipIconName, "OVERLAY")
-            gossipIcon:SetPoint("TOPLEFT", titleButton, "TOPLEFT", 5, -6)
         end
+        gossipIcon:ClearAllPoints()
+        gossipIcon:SetPoint("LEFT", titleButton, "LEFT", 2, 0)
+        gossipIcon:SetWidth(20)
+        gossipIcon:SetHeight(20)
         if titleButton.type == "Option" then
             titleButton:SetNormalTexture(nil)
+            local regions = { titleButton:GetRegions() }
+            for _, region in pairs(regions) do
+                if region:IsObjectType("Texture") and region ~= gossipIcon then
+                    region:Hide()
+                end
+            end
             titleButton:SetHeight(titleButton:GetTextHeight() + 20)
-            SetFontColor(titleButton, "DarkBrown")
+            local titleButtonText = titleButton:GetFontString()
+            if titleButtonText then 
+                titleButtonText:ClearAllPoints()
+                titleButtonText:SetPoint("LEFT", titleButton, "LEFT", 28, 0)
+                titleButtonText:SetJustifyH("LEFT")
+                SetFontColor(titleButtonText, "DarkBrown") 
+            end
         end
-        local iconType = arg[i + 1]
+        
+        -- Fix XML layout anchoring dynamically to guarantee no overlaps
+        local ITEMS_PER_COLUMN = 10
+        local colIndex = math.floor((DGossipFrame.buttonIndex - 1) / ITEMS_PER_COLUMN)
+        local itemInCol = (DGossipFrame.buttonIndex - 1) % ITEMS_PER_COLUMN
+
+        local spacing = LayoutConfig.AncillarySpacing or -10
+        local fontSize = LayoutConfig.FontSize - 2
+        titleButton:SetWidth(400)
+        titleButton:SetHeight(fontSize + 15)
+        local fs = titleButton:GetFontString()
+        if fs then fs:SetFont(FontConfig.ButtonFont, fontSize, FontConfig.ButtonFontFlags) end
+
+        titleButton:ClearAllPoints()
+        if itemInCol == 0 then
+            if colIndex == 0 then
+                titleButton:SetPoint("TOPLEFT", DGossipFrameGreetingGoodbyeButton, "BOTTOMLEFT", -50, LayoutConfig.AncillaryInitialYOffset or -10)
+            else
+                local topOfPrevCol = getglobal("DGossipTitleButton" .. (DGossipFrame.buttonIndex - ITEMS_PER_COLUMN))
+                if topOfPrevCol then
+                    titleButton:SetPoint("TOPLEFT", topOfPrevCol, "TOPLEFT", 230, 0)
+                end
+            end
+        else
+            local prevButton = getglobal("DGossipTitleButton" .. (DGossipFrame.buttonIndex - 1))
+            if prevButton then
+                titleButton:SetPoint("TOPLEFT", prevButton, "TOPLEFT", 0, -(fontSize + 15) + spacing)
+            end
+        end
+        local iconType = string.lower(select(i + 1, ...) or "gossip")
         local texturePath
         local iconMap = {
             ["banker"]="bankerGossipIcon",
@@ -777,21 +899,24 @@ function DGossipFrameOptionsUpdate(...)
             ["trainer"]="trainerGossipIcon",
             ["unlearn"]="unlearnGossipIcon",
             ["vendor"]="vendorGossipIcon",
+            ["binder"]="innKeeperGossipIcon", -- Binder is for Hearthstone/Inn
+            ["invisiblegossipicon"]="gossip",
         }
-        if iconType == "gossip" then
-            local specificType = DetermineGossipIconType(arg[i])
-            texturePath = "Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\" .. (specificType or "gossip") .. "GossipIcon"
+        if iconType == "gossip" or iconType == "invisiblegossipicon" then
+            local specificType = DetermineGossipIconType(title)
+            texturePath = "Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\" .. (specificType or "gossip") .. "GossipIcon.tga"
         elseif iconMap[iconType] then
-            texturePath = "Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\" .. iconMap[iconType]
+            texturePath = "Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\" .. iconMap[iconType] .. ".tga"
         else
-            texturePath = "Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\petitionGossipIcon"
+            texturePath = "Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\gossipGossipIcon.tga"
         end
         if texturePath then
-            gossipIcon:SetTexture(texturePath);
-            gossipIcon:Show()
-            if not gossipIcon:GetTexture() then
-                gossipIcon:SetTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\petitionGossipIcon");
+            if IDUI_DEBUG == 1 then DEFAULT_CHAT_FRAME:AddMessage("IDUI DEBUG: Path: " .. texturePath) end
+            local success = gossipIcon:SetTexture(texturePath)
+            if not success or not gossipIcon:GetTexture() then
+                gossipIcon:SetTexture("Interface\\AddOns\\ImmersiveDialogUI\\src\\assets\\art\\icons\\gossipGossipIcon.tga")
             end
+            gossipIcon:Show()
         else
             gossipIcon:Hide()
         end
@@ -813,9 +938,12 @@ function DetermineGossipIconType(gossipText)
     for _, class in pairs(classes) do
         if string.find(text, class) then return class end
     end
-    if string.find(text, "profession") and string.find(text, "trainer") then return "professionTrainer"
+    if string.find(text, "browse") or string.find(text, "goods") or string.find(text, "vendor") or string.find(text, "trade") or string.find(text, "shop") or string.find(text, "buy") or string.find(text, "sell") then return "vendor"
+    elseif string.find(text, "profession") and string.find(text, "trainer") then return "professionTrainer"
     elseif string.find(text, "class") and string.find(text, "trainer") then return "classTrainer"
-    elseif string.find(text, "stable") then return "stablemaster"
+    elseif string.find(text, "horse") or string.find(text, "riding") or string.find(text, "mount") then return "weaponsTrainer" -- Fallback to trainer icon
+    elseif string.find(text, "food") or string.find(text, "drink") then return "vendor"
+    elseif string.find(text, "wood") or string.find(text, "lumber") or string.find(text, "cutting") then return "professionTrainer"
     elseif string.find(text, "inn") then return "innkeeper"
     elseif string.find(text, "mailbox") then return "mailbox"
     elseif string.find(text, "guild master") then return "guildMaster"

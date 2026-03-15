@@ -1,4 +1,4 @@
--- ImmersiveDialogUI.lua (修正SavedVariables保存问题并添加XPBar控制和按键绑定)
+-- ImmersiveDialogUI.lua
 -- Version 2.1: Fixed tab creation logic to prevent UIPanelTemplates error.
 
 local IDUI_Defaults = {
@@ -16,13 +16,12 @@ local IDUI_Defaults = {
     TextLanguage = false,
     xOffsetOffset = 3, -- 这个参数改为了WordMinLimit，决定句子的最短长度
     FadeDuration = 0.3,
-    IfXPbarOn = 1,
     KEY_YES = "E", -- 接受按键
     KEY_NO = "R",  -- 拒绝/返回按键
 	-- 新增副面板默认值
 	IfCameraMode = 0, --相机模式开关
 	IfButtonShow = 1, --按钮图标开关
-	IfXBOXButton = 0  --XBOX图标开关
+    IfXBOXButton = 0  --XBOX图标开关
 }
 
 -- 获取动态默认值的函数
@@ -90,10 +89,6 @@ local function SetVar(name, val)
         end
     end
     
-    if name == "IfXPbarOn" and XPBar_UpdateDisplay then
-        XPBar_UpdateDisplay()
-    end
-    
     if SaveBindings then
         SaveBindings(1)
     end
@@ -118,12 +113,12 @@ local function CreateSlider(parent, name, title, minV, maxV, step, default)
     UpdateSliderVisuals(s, default, step)
     valFS:SetPoint("LEFT", s, "RIGHT", 10, 0)
 
-    s:SetScript("OnValueChanged", function()
-        if not this or not this.GetValue then return end
-        local v = this:GetValue()
+    s:SetScript("OnValueChanged", function(self)
+        if not self or not self.GetValue then return end
+        local v = self:GetValue()
         local formattedValue = tonumber(string.format("%.2f", v))
         SetVar(name, formattedValue)
-        UpdateSliderVisuals(this, formattedValue, step)
+        UpdateSliderVisuals(self, formattedValue, step)
     end)
 
     return s, lbl
@@ -138,13 +133,13 @@ local function CreateCheck(parent, name, title, default)
     lbl:SetText(title)
     lbl:SetJustifyH("LEFT")
     if default then cb:SetChecked(1) else cb:SetChecked(nil) end
-    cb:SetScript("OnClick", function()
+    cb:SetScript("OnClick", function(self)
         local checked = false
-        if this and this.GetChecked and this:GetChecked() then 
+        if self and self.GetChecked and self:GetChecked() then 
             checked = true 
         end
         -- 对于需要返回1或0的开关进行转换
-        if name == "IfXPbarOn" or name == "IfCameraMode" or name == "IfButtonShow" or name == "IfXBOXButton" then
+        if name == "IfCameraMode" or name == "IfButtonShow" or name == "IfXBOXButton" then
             SetVar(name, checked and 1 or 0)
         else
             SetVar(name, checked)
@@ -175,17 +170,16 @@ local function CreateKeybinding(parent, name, title, default)
     keyText:SetText(default or "")
     btn.keyText = keyText
 
-    btn:SetScript("OnClick", function()
+    btn:SetScript("OnClick", function(self)
         if IDUI_KeybindCaptureFrame and IDUI_KeybindCaptureFrame:IsShown() then return end
-        IDUI_CurrentBindingButton = this
-        this.keyText:SetText("...")
+        IDUI_CurrentBindingButton = self
+        self.keyText:SetText("...")
         if not IDUI_KeybindCaptureFrame then
             IDUI_KeybindCaptureFrame = CreateFrame("Frame", "IDUI_KeybindCaptureFrame", UIParent)
             IDUI_KeybindCaptureFrame:SetFrameStrata("FULLSCREEN_DIALOG")
             IDUI_KeybindCaptureFrame:SetAllPoints(UIParent)
             IDUI_KeybindCaptureFrame:EnableKeyboard(true)
-            IDUI_KeybindCaptureFrame:SetScript("OnKeyDown", function()
-                local key = arg1
+            IDUI_KeybindCaptureFrame:SetScript("OnKeyDown", function(self, key)
                 local button = IDUI_CurrentBindingButton
                 IDUI_KeybindCaptureFrame:Hide()
                 if not button or not button.bindingName then return end
@@ -198,7 +192,7 @@ local function CreateKeybinding(parent, name, title, default)
                 button.keyText:SetText(key)
                 IDUI_CurrentBindingButton = nil
             end)
-            IDUI_KeybindCaptureFrame:SetScript("OnMouseDown", function()
+            IDUI_KeybindCaptureFrame:SetScript("OnMouseDown", function(self, mouseButton)
                 local button = IDUI_CurrentBindingButton
                 IDUI_KeybindCaptureFrame:Hide()
                 if button and button.bindingName then
@@ -256,16 +250,16 @@ local function CreateConfigPanel()
     tabMisc:SetText("Misc")
     tabMisc:SetPoint("LEFT", tabHUD, "RIGHT", -15, 0)
     
-    tabHUD:SetScript("OnClick", function()
+    tabHUD:SetScript("OnClick", function(self)
         tabMisc:SetChecked(nil) -- 取消另一个按钮的选中状态
-        this:SetChecked(1)      -- 确保当前按钮是选中状态
+        self:SetChecked(1)      -- 确保当前按钮是选中状态
         mainPanel:Show()
         miscPanel:Hide()
     end)
 
-    tabMisc:SetScript("OnClick", function()
+    tabMisc:SetScript("OnClick", function(self)
         tabHUD:SetChecked(nil)  -- 取消另一个按钮的选中状态
-        this:SetChecked(1)      -- 确保当前按钮是选中状态
+        self:SetChecked(1)      -- 确保当前按钮是选中状态
         mainPanel:Hide()
         miscPanel:Show()
     end)
@@ -290,7 +284,7 @@ local function CreateConfigPanel()
         { name = "FadeDuration", title = "Fade in Duration", min = 0.0, max = 2.0, step = 0.01, def = IDUI_Defaults.FadeDuration },
     }
     
-    local total = table.getn(defs)
+    local total = #defs
     local cols = 2
     local rows = math.ceil(total / cols)
     local availableHeight = 500 * 0.75
@@ -320,10 +314,6 @@ local function CreateConfigPanel()
     local cb1, cbLabel1 = CreateCheck(mainPanel, "TextLanguage", "Select when Text is Hanzi中文 日文 韓文...", IDUI_Defaults.TextLanguage)
     cb1:SetPoint("TOPLEFT", mainPanel, "TOPLEFT", rightX-3, control_y_start+13)
     cbLabel1:SetPoint("LEFT", cb1, "RIGHT", 6, 0)
-
-    local cb2, cbLabel2 = CreateCheck(mainPanel, "IfXPbarOn", "XP bar looks like GuildWars 2", IDUI_Defaults.IfXPbarOn == 1)
-    cb2:SetPoint("TOPLEFT", cb1, "BOTTOMLEFT", 0, 5)
-    cbLabel2:SetPoint("LEFT", cb2, "RIGHT", 6, 0)
     
     local kb1, kbLabel1 = CreateKeybinding(mainPanel, "KEY_YES", "Accept", IDUI_Defaults.KEY_YES)
     kb1:SetPoint("BOTTOM", mainPanel, "BOTTOM", -45, 12)
@@ -397,7 +387,7 @@ local function CreateConfigPanel()
         local currentTextLanguage = ImmersiveUIDB.TextLanguage
         
         -- 重置主面板滑块
-        for i=1, table.getn(defs) do
+        for i=1, #defs do
             local d = defs[i]
             local resetValue = (d.name == "xOffsetOffset") and (currentTextLanguage and 6 or 3) or d.def
             SetVar(d.name, resetValue)
@@ -410,7 +400,6 @@ local function CreateConfigPanel()
         
         -- 重置其他设置
         SetVar("TextLanguage", currentTextLanguage)
-        SetVar("IfXPbarOn", IDUI_Defaults.IfXPbarOn)
         SetVar("KEY_YES", IDUI_Defaults.KEY_YES)
         SetVar("KEY_NO", IDUI_Defaults.KEY_NO)
         SetVar("IfCameraMode", IDUI_Defaults.IfCameraMode)
@@ -420,7 +409,6 @@ local function CreateConfigPanel()
         -- 刷新UI显示
         -- 主面板
         local cb1 = getglobal("IDUI_Check_TextLanguage"); if cb1 then if currentTextLanguage then cb1:SetChecked(1) else cb1:SetChecked(nil) end end
-        local cb2 = getglobal("IDUI_Check_IfXPbarOn"); if cb2 then if IDUI_Defaults.IfXPbarOn == 1 then cb2:SetChecked(1) else cb2:SetChecked(nil) end end
         local kb1 = getglobal("IDUI_Keybind_KEY_YES"); if kb1 then kb1.keyText:SetText(IDUI_Defaults.KEY_YES) end
         local kb2 = getglobal("IDUI_Keybind_KEY_NO"); if kb2 then kb2.keyText:SetText(IDUI_Defaults.KEY_NO) end
         -- 副面板
@@ -443,7 +431,7 @@ local function CreateConfigPanel()
     f:SetScript("OnShow", function()
         InitializeDatabase()
         -- 更新主面板滑块
-        for i = 1, table.getn(defs) do
+        for i = 1, #defs do
             local d = defs[i]
             local slider = getglobal("IDUI_Slider_" .. d.name)
             if slider then
@@ -455,7 +443,6 @@ local function CreateConfigPanel()
         
         -- 更新主面板复选框和按键
         local cbObj1 = getglobal("IDUI_Check_TextLanguage"); if cbObj1 then if ImmersiveUIDB.TextLanguage then cbObj1:SetChecked(1) else cbObj1:SetChecked(nil) end end
-        local cbObj2 = getglobal("IDUI_Check_IfXPbarOn"); if cbObj2 then if ImmersiveUIDB.IfXPbarOn == 1 then cbObj2:SetChecked(1) else cbObj2:SetChecked(nil) end end
         local kbObj1 = getglobal("IDUI_Keybind_KEY_YES"); if kbObj1 then kbObj1.keyText:SetText(ImmersiveUIDB.KEY_YES or IDUI_Defaults.KEY_YES) end
         local kbObj2 = getglobal("IDUI_Keybind_KEY_NO"); if kbObj2 then kbObj2.keyText:SetText(ImmersiveUIDB.KEY_NO or IDUI_Defaults.KEY_NO) end
 
@@ -477,9 +464,7 @@ local IDUI_EventFrame = CreateFrame("Frame")
 IDUI_EventFrame:RegisterEvent("ADDON_LOADED")
 IDUI_EventFrame:RegisterEvent("VARIABLES_LOADED")
 IDUI_EventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-IDUI_EventFrame:SetScript("OnEvent", function()
-    local event = arg1
-    local addonName = arg2
+IDUI_EventFrame:SetScript("OnEvent", function(self, event, addonName)
     
     if event == "ADDON_LOADED" and addonName == "ImmersiveDialogUI" then
         InitializeDatabase()
